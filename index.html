@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Departures</title>
+<meta name="description" content="한 곳에 모은 링크 모음">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f0e0c;
+    --board:#17181a;
+    --board-edge:#232427;
+    --row:#1b1c1f;
+    --row-alt:#1f2023;
+    --flap:#ece7d8;
+    --flap-dim:#8f8a78;
+    --amber:#e3a857;
+    --amber-soft:rgba(227,168,87,.14);
+    --divider:#2b2d30;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 50% -10%, #201d17 0%, var(--bg) 55%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    color:var(--flap);
+  }
+
+  .board{
+    width:100%;
+    max-width:560px;
+    background:var(--board);
+    border:1px solid var(--board-edge);
+    border-radius:8px;
+    box-shadow:
+      0 40px 80px -30px rgba(0,0,0,.7),
+      inset 0 1px 0 rgba(255,255,255,.03);
+    overflow:hidden;
+    position:relative;
+  }
+  .board::before{
+    /* 은은한 스캔라인 질감 */
+    content:"";
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(
+      to bottom, rgba(255,255,255,.015) 0px, rgba(255,255,255,.015) 1px,
+      transparent 1px, transparent 3px
+    );
+    pointer-events:none;
+  }
+
+  .board-head{
+    padding:28px 26px 20px;
+    border-bottom:1px solid var(--divider);
+    position:relative;
+  }
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11px;
+    letter-spacing:.18em;
+    color:var(--amber);
+    margin-bottom:16px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:6px;height:6px;border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 8px var(--amber);
+    flex-shrink:0;
+  }
+
+  .identity{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .avatar{
+    flex-shrink:0;
+    width:52px;height:52px;
+    border-radius:var(--radius);
+    border:1px solid var(--amber);
+    background:var(--amber-soft);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Big Shoulders Display', sans-serif;
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:.02em;
+    color:var(--amber);
+  }
+  .identity-text h1{
+    margin:0 0 6px;
+    font-family:'Big Shoulders Display', sans-serif;
+    font-weight:800;
+    text-transform:uppercase;
+    font-size:clamp(26px, 6vw, 34px);
+    line-height:1;
+    letter-spacing:.01em;
+    color:var(--flap);
+  }
+  .identity-text p{
+    margin:0;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--flap-dim);
+    max-width:38ch;
+  }
+
+  .manifest{
+    list-style:none;
+    margin:0;
+    padding:6px 0;
+  }
+  .manifest li{
+    border-bottom:1px solid var(--divider);
+  }
+  .manifest li:last-child{ border-bottom:none; }
+
+  .row{
+    display:grid;
+    grid-template-columns:44px 1fr auto;
+    align-items:center;
+    gap:14px;
+    padding:16px 26px;
+    text-decoration:none;
+    color:inherit;
+    background:var(--row);
+    transform-origin:top;
+    backface-visibility:hidden;
+    opacity:0;
+    animation:flapIn .55s ease forwards;
+  }
+  .manifest li:nth-child(even) .row{ background:var(--row-alt); }
+
+  .row:hover, .row:focus-visible{ background:var(--amber-soft); }
+  .row:focus-visible{ outline:2px solid var(--amber); outline-offset:-2px; }
+
+  .gate{
+    font-family:'Big Shoulders Display', sans-serif;
+    font-weight:700;
+    font-size:18px;
+    color:var(--amber);
+    letter-spacing:.03em;
+  }
+  .dest{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    min-width:0;
+  }
+  .dest-label{
+    font-size:14.5px;
+    font-weight:500;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    color:var(--flap);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .dest-url{
+    font-size:11px;
+    color:var(--flap-dim);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .status{
+    font-size:10.5px;
+    letter-spacing:.14em;
+    color:var(--amber-dim, var(--amber));
+    opacity:.8;
+    justify-self:end;
+  }
+
+  .board-foot{
+    padding:16px 26px 22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    font-size:10.5px;
+    color:var(--flap-dim);
+    letter-spacing:.04em;
+  }
+
+  @keyframes flapIn{
+    0%{ opacity:0; transform:rotateX(-85deg); }
+    55%{ opacity:1; }
+    100%{ opacity:1; transform:rotateX(0deg); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .row{ animation:none; opacity:1; }
+  }
+  @media (max-width:420px){
+    .row{ grid-template-columns:36px 1fr; }
+    .status{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="board" id="board">
+  <div class="board-head">
+    <div class="eyebrow"><span id="countLabel">DEPARTURES</span></div>
+    <div class="identity">
+      <div class="avatar" id="avatar"></div>
+      <div class="identity-text">
+        <h1 id="siteTitle"></h1>
+        <p id="siteDesc"></p>
+      </div>
+    </div>
+  </div>
+
+  <ol class="manifest" id="linkList"></ol>
+
+  <div class="board-foot">
+    <span id="siteFooter"></span>
+    <span>ALL LINKS OPEN NEW TAB</span>
+  </div>
+</main>
+
+<script>
+/* ============================================================
+   ✏️  아래 CONFIG 부분만 수정하면 사이트 내용이 바뀝니다.
+   ------------------------------------------------------------
+   - title, description, avatar : 상단 프로필 영역
+   - links 배열 : 원하는 만큼 자유롭게 추가/삭제/순서 변경
+     각 링크는 { label, url, status } 세 가지만 채우면 됩니다.
+     status는 생략하면 자동으로 "OPEN" 이 표시됩니다.
+   ============================================================ */
+const CONFIG = {
+  title: "김도윤",
+  description: "만들고 기록합니다 — 개발, 글쓰기, 사이드 프로젝트",
+  avatar: "DY", // 이니셜 1~2글자 또는 이모지 추천
+
+  links: [
+    { label: "포트폴리오",     url: "https://example.com" },
+    { label: "GitHub",         url: "https://github.com/yourname" },
+    { label: "블로그",         url: "https://example.com/blog" },
+    { label: "이메일 보내기",  url: "mailto:you@example.com", status: "MAIL" },
+    { label: "인스타그램",     url: "https://instagram.com/yourname" },
+  ],
+
+  footer: "© 2026 김도윤",
+};
+/* ============================================================
+   ⛔ 여기부터는 렌더링 로직입니다. 보통 수정할 필요 없어요.
+   ============================================================ */
+
+document.title = CONFIG.title;
+document.getElementById('siteTitle').textContent = CONFIG.title;
+document.getElementById('siteDesc').textContent = CONFIG.description;
+document.getElementById('avatar').textContent = CONFIG.avatar;
+document.getElementById('siteFooter').textContent = CONFIG.footer;
+document.getElementById('countLabel').textContent =
+  `DEPARTURES · ${CONFIG.links.length}`;
+
+const list = document.getElementById('linkList');
+
+CONFIG.links.forEach((link, i) => {
+  const li = document.createElement('li');
+
+  const a = document.createElement('a');
+  a.className = 'row';
+  a.href = link.url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.style.animationDelay = `${i * 70}ms`;
+
+  const gate = document.createElement('span');
+  gate.className = 'gate';
+  gate.textContent = String(i + 1).padStart(2, '0');
+
+  const dest = document.createElement('span');
+  dest.className = 'dest';
+
+  const label = document.createElement('span');
+  label.className = 'dest-label';
+  label.textContent = link.label;
+
+  const url = document.createElement('span');
+  url.className = 'dest-url';
+  url.textContent = link.url.replace(/^https?:\/\//, '');
+
+  dest.append(label, url);
+
+  const status = document.createElement('span');
+  status.className = 'status';
+  status.textContent = link.status || 'OPEN';
+
+  a.append(gate, dest, status);
+  li.appendChild(a);
+  list.appendChild(li);
+});
+</script>
+</body>
+</html>
