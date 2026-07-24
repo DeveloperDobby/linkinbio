@@ -232,7 +232,24 @@
 </main>
 
 <script>
-/* ============================================================
+const CONFIG = {
+  title: "DEVELOPERDOBBY",
+  description: "만들고 기록합니다 — 개발 프로젝트",
+  avatar: "DD", // 이니셜 1~2글자 또는 이모지 추천
+
+  links: [
+    { label: "Github ",     url: "https://github.com/developerdobby" },
+    { label: "PDF/PPTX 페이지 편집기",         url: "https://developerdobby.github.io/pdf_editor/" },
+    { label: "base64",  url: "https://developerdobby.github.io/base64" },
+    { label: "2gather",     url: "https://instagram.com/yournamehttps://github.com/DeveloperDobby/2gather" },
+  ],
+
+  footer: "© 2026 DEVELOPERDOBBY",
+};
+/*
+<script>
+/* 예시
+============================================================
    ✏️  아래 CONFIG 부분만 수정하면 사이트 내용이 바뀝니다.
    ------------------------------------------------------------
    - title, description, avatar : 상단 프로필 영역
@@ -255,9 +272,7 @@ const CONFIG = {
 
   footer: "© 2026 김도윤",
 };
-/* ============================================================
-   ⛔ 여기부터는 렌더링 로직입니다. 보통 수정할 필요 없어요.
-   ============================================================ */
+*/
 
 document.title = CONFIG.title;
 document.getElementById('siteTitle').textContent = CONFIG.title;
